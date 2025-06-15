@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { TooltipHelper } from "./ui/tooltip-helper";
 import { Input } from "@/components/ui/input";
@@ -77,7 +76,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           Topic
-          <TooltipHelper text="What do you want explained?" />
+          <TooltipHelper text="What do you want explained?">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <Input
           required
@@ -94,7 +95,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           Age
-          <TooltipHelper text="This affects explanation simplicity!" />
+          <TooltipHelper text="This affects explanation simplicity!">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <Input
           required
@@ -112,7 +115,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           Fantasy Race
-          <TooltipHelper text="Elf, dragon, ogre, fairy, goblin, etc." />
+          <TooltipHelper text="Elf, dragon, ogre, fairy, goblin, etc.">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <select
           name="fantasyRace"
@@ -132,7 +137,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           Gender
-          <TooltipHelper text="How should the explanation refer to you?" />
+          <TooltipHelper text="How should the explanation refer to you?">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <Input
           name="gender"
@@ -146,7 +153,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           Nationality
-          <TooltipHelper text="Japanese, French, Martian, etc." />
+          <TooltipHelper text="Japanese, French, Martian, etc.">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <Input
           name="nationality"
@@ -160,7 +169,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           Vibe
-          <TooltipHelper text="Sassy, hyperactive, annoyed, etc." />
+          <TooltipHelper text="Sassy, hyperactive, annoyed, etc.">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <select
           name="vibe"
@@ -179,7 +190,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           Profession
-          <TooltipHelper text="Toddler, pirate, professor, etc." />
+          <TooltipHelper text="Toddler, pirate, professor, etc.">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <select
           name="profession"
@@ -198,7 +211,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           Era
-          <TooltipHelper text="Medieval, modern, steampunk, 2040, etc." />
+          <TooltipHelper text="Medieval, modern, steampunk, 2040, etc.">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <select
           name="era"
@@ -216,7 +231,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
 
       <div>
         <label className="block font-medium mb-1">
-          IQ <TooltipHelper text="For funny effect. E.g., 0 for very silly explanations!" />
+          IQ <TooltipHelper text="For funny effect. E.g., 0 for very silly explanations!">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <Input
           name="iq"
@@ -233,7 +250,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           Special Mode
-          <TooltipHelper text="e.g., 'Explain with emojis', 'rap style', 'tweet', etc." />
+          <TooltipHelper text="e.g., 'Explain with emojis', 'rap style', 'tweet', etc.">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <select
           name="specialMode"
@@ -252,7 +271,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
       <div>
         <label className="block font-medium mb-1">
           <span className="inline-flex items-center gap-1">Groq API Key</span>
-          <TooltipHelper text="Get your free API key at https://console.groq.com (never stored)" />
+          <TooltipHelper text="Get your free API key at https://console.groq.com (never stored)">
+            <span className="ml-1">🛈</span>
+          </TooltipHelper>
         </label>
         <Input
           required
