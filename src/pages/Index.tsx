@@ -85,7 +85,7 @@ function randomMeshBlobs(colors: string[], isDark: boolean) {
             : "radial-gradient(circle at 44% 80%, rgba(79,255,228,0.09) 0%, rgba(246,252,251,0.59) 100%)",
         zIndex: 2,
         pointerEvents: "none",
-        mixBlendMode: "lighter"
+        mixBlendMode: "lighten"
       }} />
     </div>
   );
