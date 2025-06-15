@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import ExplainerForm, { ExplainerFormInputs } from "@/components/ExplainerForm";
 import ExplainerCard from "@/components/ExplainerCard";
@@ -140,8 +141,36 @@ function Index() {
         <ThemeToggle />
         <BackgroundCustomizer colors={colors} onColorsChange={setColors} />
       </div>
-      <div className="w-full py-8 px-2 md:px-0 relative z-20">
-        {stage === "form" && <ExplainerForm onSubmit={handleSubmit} disabled={stage !== "form"} />}
+      <div className="w-full py-8 px-2 md:px-0 relative z-20 flex flex-col items-center">
+        {stage === "form" && (
+          <div
+            className={`
+              max-w-2xl w-full mx-auto
+              rounded-[2.2rem]
+              ${isDark
+                ? "bg-black/30 border border-rose-500/40 shadow-[0_20px_60px_0_rgba(255,40,90,0.09),0_4px_40px_0_rgba(0,0,0,0.45)]"
+                : "bg-white/80 border border-cyan-200/40 shadow-lg"}
+              p-0 md:p-12 pt-8 pb-10
+              backdrop-blur-lg
+              relative
+              flex flex-col
+              before:absolute before:inset-0 before:rounded-[2.2rem] before:pointer-events-none
+              ${isDark ? "before:bg-gradient-to-br before:from-white/0 before:via-rose-600/5 before:to-rose-400/10" : ""}
+              transition
+            `}
+            style={
+              isDark
+                ? {
+                    boxShadow:
+                      "0 16px 48px 0 rgba(255,64,135,0.13), 0 3px 14px 0 rgba(0,0,0,0.38)",
+                    border: "1.5px solid rgba(255, 60, 112, 0.21)",
+                  }
+                : {}
+            }
+          >
+            <ExplainerForm onSubmit={handleSubmit} disabled={stage !== "form"} />
+          </div>
+        )}
         {stage === "loading" && <Loader label="Summoning LLM wisdom…" />}
         {stage === "done" && (
           <ExplainerCard answer={result} persona={persona} onReset={handleReset} />
@@ -163,3 +192,4 @@ function Index() {
 };
 
 export default Index;
+
