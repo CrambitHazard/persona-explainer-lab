@@ -18,6 +18,8 @@ const Index = () => {
     try {
       const personaDisplay = `${fields.age}-year-old ${fields.fantasyRace}${fields.gender ? ` (${fields.gender})` : ""}${fields.vibe ? `, ${fields.vibe}` : ""}${fields.profession ? `, ${fields.profession}` : ""}${fields.era ? `, ${fields.era}` : ""}`;
       setPersona(personaDisplay);
+
+      // Removed groqKey usage
       const { text } = await getGroqExplanation(
         {
           topic: fields.topic,
@@ -30,8 +32,7 @@ const Index = () => {
           era: fields.era,
           iq: fields.iq,
           specialMode: fields.specialMode,
-        },
-        fields.groqKey
+        }
       );
       setResult(text.trim());
       setStage("done");

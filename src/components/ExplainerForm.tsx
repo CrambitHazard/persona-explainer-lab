@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { TooltipHelper } from "./ui/tooltip-helper";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,7 @@ export interface ExplainerFormInputs {
   era: string;
   iq: string;
   specialMode: string;
-  groqKey: string;
+  // groqKey removed
 }
 
 interface ExplainerFormProps {
@@ -24,7 +25,7 @@ interface ExplainerFormProps {
 }
 
 export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps) {
-  // Provide default values for all fields:
+  // Provide default values for all fields (no groqKey)
   const [fields, setFields] = useState<ExplainerFormInputs>({
     topic: "Quantum physics",
     age: "8",
@@ -36,7 +37,6 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
     era: "2040",
     iq: "120",
     specialMode: "Rap style",
-    groqKey: "",
   });
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -232,29 +232,12 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
         />
       </div>
 
-      <div>
-        <label className="block font-medium mb-1">
-          <span className="inline-flex items-center gap-1">Groq API Key</span>
-          <TooltipHelper text="Get your free API key at https://console.groq.com (never stored)">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          required
-          name="groqKey"
-          type="password"
-          autoComplete="off"
-          disabled={disabled}
-          value={fields.groqKey}
-          onChange={handleChange}
-          placeholder="Paste your Groq API key"
-        />
-      </div>
+      {/* Groq Key field removed */}
 
       <div className="col-span-2 mt-2 flex items-center justify-center">
         <Button
           size="lg"
-          disabled={!fields.topic || !fields.age || !fields.fantasyRace || !fields.groqKey || disabled}
+          disabled={!fields.topic || !fields.age || !fields.fantasyRace || disabled}
           className="px-8 font-bold text-lg"
           type="submit"
         >
@@ -264,3 +247,5 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
     </form>
   );
 }
+
+// ... end of file

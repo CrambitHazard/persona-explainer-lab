@@ -1,4 +1,3 @@
-
 export interface GroqInputs {
   topic: string;
   age: string;
@@ -17,31 +16,18 @@ export interface GroqResult {
   prompt: string;
 }
 
-export async function getGroqExplanation(inputs: GroqInputs, apiKey: string): Promise<GroqResult> {
-  const prompt = buildPrompt(inputs);
-
-  const result = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+export async function getGroqExplanation(inputs: GroqInputs): Promise<GroqResult> {
+  // New: Calling the Supabase Edge Function instead of Groq directly
+  const response = await fetch("/functions/v1/groq-explain", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({
-      model: "mixtral-8x7b-32768",
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        }
-      ],
-      max_tokens: 512,
-      temperature: 0.7
-    }),
+    body: JSON.stringify(inputs)
   });
-  if (!result.ok) throw new Error("Groq API error");
-  const data = await result.json();
-  const answer = data.choices?.[0]?.message?.content || "No answer.";
-  return { text: answer, prompt };
+  if (!response.ok) throw new Error("Groq Edge Function API error");
+  const data = await response.json();
+  return { text: data.text || "No answer.", prompt: data.prompt || "" };
 }
 
 // Compose the actual LLM prompt from user fields
