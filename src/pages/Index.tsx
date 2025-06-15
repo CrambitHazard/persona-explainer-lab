@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import ExplainerForm, { ExplainerFormInputs } from "@/components/ExplainerForm";
 import ExplainerCard from "@/components/ExplainerCard";
@@ -130,6 +129,10 @@ function Index() {
       className={`
         min-h-screen flex items-center justify-center transition-all relative
         ${stage === "done" ? "backdrop-blur-2xl" : ""}
+        bg-gradient-to-br
+        ${isDark
+          ? "from-[#191828] via-[#192230] to-[#13151c]" // dark violet/blue gradient
+          : "from-[#eef6fa] via-[#e8fbfa] to-[#fcfcfc]"}
       `}
       style={{
         background: "none"
@@ -145,25 +148,27 @@ function Index() {
         {stage === "form" && (
           <div
             className={`
-              max-w-2xl w-full mx-auto
-              rounded-[2.2rem]
-              ${isDark
-                ? "bg-black/30 border border-rose-500/40 shadow-[0_20px_60px_0_rgba(255,40,90,0.09),0_4px_40px_0_rgba(0,0,0,0.45)]"
-                : "bg-white/80 border border-cyan-200/40 shadow-lg"}
+              max-w-2xl w-full mx-auto rounded-[2.1rem]
+              border shadow-2xl
               p-0 md:p-12 pt-8 pb-10
-              backdrop-blur-lg
-              relative
-              flex flex-col
-              before:absolute before:inset-0 before:rounded-[2.2rem] before:pointer-events-none
-              ${isDark ? "before:bg-gradient-to-br before:from-white/0 before:via-rose-600/5 before:to-rose-400/10" : ""}
+              flex flex-col relative
+              backdrop-blur-[8px]
               transition
+              ${
+                isDark
+                  ? `bg-white/6 border-pink-400/30 ring-1 ring-inset ring-pink-400/20
+                      shadow-[0_2px_40px_0_rgba(240,82,173,0.08)]`
+                  : "bg-white/80 border-cyan-200/50 shadow-lg"
+              }
+              before:absolute before:inset-0 before:rounded-[2.1rem] before:pointer-events-none
+              ${isDark ? "before:bg-white/5" : ""}
             `}
             style={
               isDark
                 ? {
-                    boxShadow:
-                      "0 16px 48px 0 rgba(255,64,135,0.13), 0 3px 14px 0 rgba(0,0,0,0.38)",
-                    border: "1.5px solid rgba(255, 60, 112, 0.21)",
+                    boxShadow: "0 0 0 1.5px rgba(255,60,120,0.13), 0 8px 40px 0 rgba(40,20,70,0.18)",
+                    border: "1.5px solid rgba(255, 64, 166, 0.17)",
+                    // Tightened up border
                   }
                 : {}
             }
@@ -192,4 +197,3 @@ function Index() {
 };
 
 export default Index;
-

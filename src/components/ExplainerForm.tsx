@@ -4,6 +4,7 @@ import { TooltipHelper } from "./ui/tooltip-helper";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 export interface ExplainerFormInputs {
   topic: string;
@@ -16,7 +17,6 @@ export interface ExplainerFormInputs {
   era: string;
   iq: string;
   specialMode: string;
-  // groqKey removed
 }
 
 interface ExplainerFormProps {
@@ -25,7 +25,6 @@ interface ExplainerFormProps {
 }
 
 export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps) {
-  // Provide default values for all fields (no groqKey)
   const [fields, setFields] = useState<ExplainerFormInputs>({
     topic: "Quantum physics",
     age: "8",
@@ -38,6 +37,9 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
     iq: "120",
     specialMode: "Rap style",
   });
+
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFields(f => ({
@@ -54,191 +56,99 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
   return (
     <form
       className={cn(
-        "w-full max-w-2xl mx-auto grid grid-cols-2 gap-5 p-10 bg-white shadow-lg rounded-2xl border border-gray-200 transition-all",
+        "w-full max-w-2xl mx-auto grid grid-cols-2 gap-5 p-0",
+        "bg-transparent shadow-none border-none",
         disabled && "opacity-70 pointer-events-none"
       )}
-      style={{ backdropFilter: "blur(4px)" }}
+      style={{ backdropFilter: "none" }}
       onSubmit={handleSubmit}
       autoComplete="off"
     >
-      <div className="col-span-2 text-center mb-2">
-        <h1 className="text-2xl font-bold mb-1">ExplainItToMe</h1>
-        <p className="text-muted-foreground max-w-lg mx-auto">
+      <div className="col-span-2 text-center mb-2 select-none">
+        <h1 className={cn(
+          "text-2xl font-bold mb-1 transition",
+          isDark ? "text-white/25" : "text-black/40"
+        )}>
+          ExplainItToMe
+        </h1>
+        <p className={cn(
+          "text-base font-medium max-w-lg mx-auto mb-2 transition",
+          isDark ? "text-white/40" : "text-gray-700/80"
+        )}>
           Enter a topic, set a magical persona, and get a world-class LLM explanation.
         </p>
       </div>
 
-      <div>
-        <label className="block font-medium mb-1">
-          Topic
-          <TooltipHelper text="What do you want explained?">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          required
-          name="topic"
-          disabled={disabled}
-          value={fields.topic}
-          onChange={handleChange}
-          placeholder="Quantum physics, taxes, how tacos work…"
-        />
-      </div>
+      {/* Fields */}
+      {[
+        { name: "topic", label: "Topic", required: true, placeholder: "Quantum physics, taxes, how tacos work…" },
+        { name: "age", label: "Age", required: true, placeholder: "5, 25, 134…" },
+        { name: "fantasyRace", label: "Fantasy Race", required: true, placeholder: "Elf, Dragon, Ogre…" },
+        { name: "gender", label: "Gender", placeholder: "Optional: Female, Male, Enby, etc." },
+        { name: "nationality", label: "Nationality", placeholder: "Optional" },
+        { name: "vibe", label: "Vibe", placeholder: "Sassy, Hyperactive, Annoyed…" },
+        { name: "profession", label: "Profession", placeholder: "Pirate, Toddler, Professor…" },
+        { name: "era", label: "Era", placeholder: "Medieval, Modern, 2040…" },
+        { name: "iq", label: "IQ", placeholder: "Optional" },
+        { name: "specialMode", label: "Special Mode", placeholder: "Explain with emojis, rap style, tweet…" },
+      ].map((f, idx) => (
+        <div key={f.name} className={cn("flex flex-col gap-1 transition-all")}>
+          <label className={cn(
+            "block font-medium text-[15px] mb-1",
+            isDark ? "text-white/35" : "text-gray-700"
+          )}>
+            {f.label}
+            <TooltipHelper
+              text={
+                {
+                  "topic": "What do you want explained?",
+                  "age": "This affects explanation simplicity!",
+                  "fantasyRace": "Elf, dragon, ogre, fairy, goblin, etc.",
+                  "gender": "How should the explanation refer to you?",
+                  "nationality": "Japanese, French, Martian, etc.",
+                  "vibe": "Sassy, hyperactive, annoyed, etc.",
+                  "profession": "Toddler, pirate, professor, etc.",
+                  "era": "Medieval, modern, steampunk, 2040, etc.",
+                  "iq": "For funny effect. E.g., 0 for very silly explanations!",
+                  "specialMode": "e.g., 'Explain with emojis', 'rap style', 'tweet', etc."
+                }[f.name] || ""
+              }
+            >
+              <span className="ml-1">🛈</span>
+            </TooltipHelper>
+          </label>
+          <Input
+            required={f.required}
+            name={f.name}
+            disabled={disabled}
+            value={fields[f.name as keyof ExplainerFormInputs]}
+            inputMode={f.name === "age" || f.name === "iq" ? "numeric" : undefined}
+            onChange={handleChange}
+            placeholder={f.placeholder}
+            className={cn(
+              "transition-all font-medium text-base",
+              isDark
+                ? "bg-[#10121b] text-white border-none placeholder:text-white/40 focus:bg-[#16192a] shadow-inner"
+                : "bg-white text-black border border-gray-200 focus:bg-gray-50",
+              "h-11 rounded-lg px-5"
+            )}
+            style={{
+              boxShadow: isDark
+                ? "0 1.5px 7px 0 rgba(10,10,45,0.10), 0 0.5px 2px 0 #692a7a22"
+                : "0 0.5px 4px 0 rgba(200,200,240,0.05)"
+            }}
+          />
+        </div>
+      ))}
 
-      <div>
-        <label className="block font-medium mb-1">
-          Age
-          <TooltipHelper text="This affects explanation simplicity!">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          required
-          name="age"
-          disabled={disabled}
-          value={fields.age}
-          inputMode="numeric"
-          onChange={handleChange}
-          placeholder="5, 25, 134…"
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">
-          Fantasy Race
-          <TooltipHelper text="Elf, dragon, ogre, fairy, goblin, etc.">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          required
-          name="fantasyRace"
-          disabled={disabled}
-          value={fields.fantasyRace}
-          onChange={handleChange}
-          placeholder="Elf, Dragon, Ogre…"
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">
-          Gender
-          <TooltipHelper text="How should the explanation refer to you?">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          name="gender"
-          disabled={disabled}
-          value={fields.gender}
-          onChange={handleChange}
-          placeholder="Optional: Female, Male, Enby, etc."
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">
-          Nationality
-          <TooltipHelper text="Japanese, French, Martian, etc.">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          name="nationality"
-          disabled={disabled}
-          value={fields.nationality}
-          onChange={handleChange}
-          placeholder="Optional"
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">
-          Vibe
-          <TooltipHelper text="Sassy, hyperactive, annoyed, etc.">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          name="vibe"
-          disabled={disabled}
-          value={fields.vibe}
-          onChange={handleChange}
-          placeholder="Sassy, Hyperactive, Annoyed…"
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">
-          Profession
-          <TooltipHelper text="Toddler, pirate, professor, etc.">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          name="profession"
-          disabled={disabled}
-          value={fields.profession}
-          onChange={handleChange}
-          placeholder="Pirate, Toddler, Professor…"
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">
-          Era
-          <TooltipHelper text="Medieval, modern, steampunk, 2040, etc.">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          name="era"
-          disabled={disabled}
-          value={fields.era}
-          onChange={handleChange}
-          placeholder="Medieval, Modern, 2040…"
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">
-          IQ <TooltipHelper text="For funny effect. E.g., 0 for very silly explanations!">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          name="iq"
-          disabled={disabled}
-          value={fields.iq}
-          inputMode="numeric"
-          onChange={handleChange}
-          placeholder="Optional"
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium mb-1">
-          Special Mode
-          <TooltipHelper text="e.g., 'Explain with emojis', 'rap style', 'tweet', etc.">
-            <span className="ml-1">🛈</span>
-          </TooltipHelper>
-        </label>
-        <Input
-          name="specialMode"
-          disabled={disabled}
-          value={fields.specialMode}
-          onChange={handleChange}
-          placeholder="Explain with emojis, rap style, tweet…"
-        />
-      </div>
-
-      {/* Groq Key field removed */}
-
-      <div className="col-span-2 mt-2 flex items-center justify-center">
+      <div className="col-span-2 mt-5 flex items-center justify-center">
         <Button
           size="lg"
           disabled={!fields.topic || !fields.age || !fields.fantasyRace || disabled}
-          className="px-8 font-bold text-lg"
+          className={cn(
+            "px-8 font-extrabold text-lg shadow bg-white text-gray-900 border border-gray-100 rounded-xl",
+            "hover:bg-gray-100 transition"
+          )}
           type="submit"
         >
           Summon Explanation ✨
@@ -247,5 +157,4 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
     </form>
   );
 }
-
 // ... end of file
