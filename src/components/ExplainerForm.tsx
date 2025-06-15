@@ -23,28 +23,23 @@ interface ExplainerFormProps {
   disabled?: boolean;
 }
 
-const VIBES = ["Annoyed", "Hyperactive", "Sassy", "Shy", "Stoned"];
-const MODES = ["Explain with emojis", "Rap style", "Fairy tale", "Haiku", "Kid’s story", "Tweet"];
-const RACES = ["Elf", "Dragon", "Ogre", "Human", "Fairy", "Goblin", "Orc"];
-const ERAS = ["Medieval", "Renaissance", "Modern", "2040", "Prehistoric", "1930s", "Cyberpunk"];
-const PROFESSIONS = ["Pirate", "Toddler", "Professor", "Baker", "Ninja", "Astronaut", "Pirate Queen"];
-
 export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps) {
+  // Provide default values for all fields:
   const [fields, setFields] = useState<ExplainerFormInputs>({
-    topic: "",
-    age: "",
-    fantasyRace: "",
-    gender: "",
-    nationality: "",
-    vibe: "",
-    profession: "",
-    era: "",
-    iq: "",
-    specialMode: "",
+    topic: "Quantum physics",
+    age: "8",
+    fantasyRace: "Elf",
+    gender: "Nonbinary",
+    nationality: "Japanese",
+    vibe: "Sassy",
+    profession: "Astronaut",
+    era: "2040",
+    iq: "120",
+    specialMode: "Rap style",
     groqKey: "",
   });
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFields(f => ({
       ...f,
       [e.target.name]: e.target.value
@@ -84,8 +79,6 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
           required
           name="topic"
           disabled={disabled}
-          maxLength={72}
-          autoFocus
           value={fields.topic}
           onChange={handleChange}
           placeholder="Quantum physics, taxes, how tacos work…"
@@ -105,8 +98,6 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
           disabled={disabled}
           value={fields.age}
           inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={3}
           onChange={handleChange}
           placeholder="5, 25, 134…"
         />
@@ -119,19 +110,14 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
             <span className="ml-1">🛈</span>
           </TooltipHelper>
         </label>
-        <select
-          name="fantasyRace"
+        <Input
           required
-          className="w-full rounded-md border-gray-300 focus:ring-2 focus:ring-primary px-3 py-2"
+          name="fantasyRace"
           disabled={disabled}
           value={fields.fantasyRace}
           onChange={handleChange}
-        >
-          <option value="">Choose…</option>
-          {RACES.map(r => (
-            <option key={r} value={r}>{r}</option>
-          ))}
-        </select>
+          placeholder="Elf, Dragon, Ogre…"
+        />
       </div>
 
       <div>
@@ -173,18 +159,13 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
             <span className="ml-1">🛈</span>
           </TooltipHelper>
         </label>
-        <select
+        <Input
           name="vibe"
-          className="w-full rounded-md border-gray-300 focus:ring-2 focus:ring-primary px-3 py-2"
           disabled={disabled}
           value={fields.vibe}
           onChange={handleChange}
-        >
-          <option value="">Choose…</option>
-          {VIBES.map(v => (
-            <option key={v} value={v}>{v}</option>
-          ))}
-        </select>
+          placeholder="Sassy, Hyperactive, Annoyed…"
+        />
       </div>
 
       <div>
@@ -194,18 +175,13 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
             <span className="ml-1">🛈</span>
           </TooltipHelper>
         </label>
-        <select
+        <Input
           name="profession"
-          className="w-full rounded-md border-gray-300 focus:ring-2 focus:ring-primary px-3 py-2"
           disabled={disabled}
           value={fields.profession}
           onChange={handleChange}
-        >
-          <option value="">Choose…</option>
-          {PROFESSIONS.map(pro => (
-            <option key={pro} value={pro}>{pro}</option>
-          ))}
-        </select>
+          placeholder="Pirate, Toddler, Professor…"
+        />
       </div>
 
       <div>
@@ -215,18 +191,13 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
             <span className="ml-1">🛈</span>
           </TooltipHelper>
         </label>
-        <select
+        <Input
           name="era"
-          className="w-full rounded-md border-gray-300 focus:ring-2 focus:ring-primary px-3 py-2"
           disabled={disabled}
           value={fields.era}
           onChange={handleChange}
-        >
-          <option value="">Choose…</option>
-          {ERAS.map(e => (
-            <option key={e} value={e}>{e}</option>
-          ))}
-        </select>
+          placeholder="Medieval, Modern, 2040…"
+        />
       </div>
 
       <div>
@@ -240,8 +211,6 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
           disabled={disabled}
           value={fields.iq}
           inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={3}
           onChange={handleChange}
           placeholder="Optional"
         />
@@ -254,18 +223,13 @@ export default function ExplainerForm({ onSubmit, disabled }: ExplainerFormProps
             <span className="ml-1">🛈</span>
           </TooltipHelper>
         </label>
-        <select
+        <Input
           name="specialMode"
-          className="w-full rounded-md border-gray-300 focus:ring-2 focus:ring-primary px-3 py-2"
           disabled={disabled}
           value={fields.specialMode}
           onChange={handleChange}
-        >
-          <option value="">Choose…</option>
-          {MODES.map(mode => (
-            <option key={mode} value={mode}>{mode}</option>
-          ))}
-        </select>
+          placeholder="Explain with emojis, rap style, tweet…"
+        />
       </div>
 
       <div>
