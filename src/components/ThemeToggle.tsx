@@ -1,28 +1,25 @@
 
 import React from "react";
 import { useTheme } from "next-themes";
-import { ToggleLeft, ToggleRight } from "lucide-react";
+import { MoonStar, SunMedium } from "lucide-react";
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
-
+  const { resolvedTheme, setTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+
   return (
     <button
       aria-label="Toggle theme"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/30 dark:border-white/10
-        rounded-full shadow-xl p-2 transition flex items-center justify-center hover:scale-105 active:scale-95
-        glass-toggle"
+      className="backdrop-blur-xl bg-white/30 dark:bg-black/30 border border-white/30 dark:border-white/10 rounded-full shadow-xl p-2 transition flex items-center justify-center hover:scale-105 active:scale-95"
       style={{
-        boxShadow:
-          "0 4px 24px 0 rgba(0,0,0,0.10), 0 1.5px 7px 0 rgba(0,0,0,0.08)",
+        boxShadow: "0 6px 32px 0 rgba(0,0,0,0.11), 0 2px 10px 0 rgba(0,0,0,0.10)",
       }}
     >
       {isDark ? (
-        <ToggleLeft size={24} className="text-slate-900 dark:text-emerald-100" />
+        <SunMedium size={22} className="text-yellow-400" />
       ) : (
-        <ToggleRight size={24} className="text-emerald-700 dark:text-emerald-200" />
+        <MoonStar size={22} className="text-emerald-700" />
       )}
     </button>
   );
