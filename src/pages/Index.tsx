@@ -148,108 +148,32 @@ function Index() {
         {stage === "form" && (
           <div
             className={`
-              max-w-2xl w-full mx-auto rounded-[1.5rem] md:rounded-[2.1rem]
-              p-0 md:p-12 pt-8 pb-10 flex flex-col relative
+              max-w-2xl w-full mx-auto rounded-[2.1rem]
+              border shadow-2xl
+              p-0 md:p-12 pt-8 pb-10
+              flex flex-col relative
+              backdrop-blur-[8px]
               transition
-              overflow-hidden
-              shadow-[0_6px_32px_0_rgba(108,56,140,0.22),0_0.5px_7px_0_rgba(0,0,0,0.15)]
-              border
-              ${isDark
-                ? "border-pink-200/70"
-                : "border-cyan-200/50"
+              ${
+                isDark
+                  ? `bg-white/6 border-pink-400/30 ring-1 ring-inset ring-pink-400/20
+                      shadow-[0_2px_40px_0_rgba(240,82,173,0.08)]`
+                  : "bg-white/80 border-cyan-200/50 shadow-lg"
               }
+              before:absolute before:inset-0 before:rounded-[2.1rem] before:pointer-events-none
+              ${isDark ? "before:bg-white/5" : ""}
             `}
             style={
               isDark
                 ? {
-                    background: "rgba(22,22,34,0.52)",
-                    backdropFilter: "blur(23px) saturate(1.45)",
-                    WebkitBackdropFilter: "blur(23px) saturate(1.45)",
-
-                    // Card box shadow for floating look:
-                    boxShadow:
-                      "0 8px 64px 3px rgba(255,25,140,0.14)," +
-                      "0 0px 1.5px 0 rgba(40,20,70,0.11)," +
-                      "0 16px 54px 0 rgba(164,51,177,0.07)",
-
-                    border: "1.7px solid rgba(255,120,220,0.22)",
-
-                    position: "relative",
-                    // to ensure pseudo-elements overlay.
+                    boxShadow: "0 0 0 1.5px rgba(255,60,120,0.13), 0 8px 40px 0 rgba(40,20,70,0.18)",
+                    border: "1.5px solid rgba(255, 64, 166, 0.17)",
+                    // Tightened up border
                   }
-                : {
-                    background: "rgba(255,255,255,0.82)",
-                    // Light mode: soft glass
-                  }
+                : {}
             }
           >
-            {/* GLOW GRADIENTS ONLY IN DARK */}
-            {isDark && (
-              <>
-                <span
-                  // Main bright purple blur at top right, like ref
-                  style={{
-                    position: "absolute",
-                    right: "-88px",
-                    top: "-78px",
-                    width: "315px",
-                    height: "230px",
-                    borderRadius: "48% 52% 52% 48%/54% 56% 44% 46%",
-                    background: "radial-gradient(circle at 70% 29%, #ef38ff88 0%, #7433ef13 58%, transparent 90%)",
-                    filter: "blur(10px)",
-                    zIndex: 1,
-                    pointerEvents: "none",
-                  }}
-                />
-                <span
-                  // Main pink blur bottom left, like ref
-                  style={{
-                    position: "absolute",
-                    left: "-68px",
-                    bottom: "-56px",
-                    width: "215px",
-                    height: "186px",
-                    borderRadius: "52% 48% 54% 46%/52% 58% 42% 48%",
-                    background: "radial-gradient(ellipse at 40% 80%, #ff51a566 0%, #ED2DD944 60%, transparent 100%)",
-                    filter: "blur(10px)",
-                    zIndex: 1,
-                    pointerEvents: "none",
-                  }}
-                />
-                <span
-                  // Soft diffused light for glare effect, top left
-                  style={{
-                    position: "absolute",
-                    left: "22px",
-                    top: "18px",
-                    width: "105px",
-                    height: "32px",
-                    borderRadius: "40% 60% 60% 40%/66% 44% 56% 34%",
-                    background: "radial-gradient(circle farthest-side, #fff2 10%, transparent 70%)",
-                    filter: "blur(6px)",
-                    zIndex: 1,
-                    pointerEvents: "none",
-                  }}
-                />
-                <span
-                  // Light inner white border for frosted "rim"
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    borderRadius: "inherit",
-                    border: "1.4px solid rgba(255,255,255,0.19)",
-                    zIndex: 2,
-                    pointerEvents: "none",
-                    boxShadow: "0 1px 16px 0 #ffbae033, 0 0px 0px 1px #fff2"
-                  }}
-                />
-                {/* ...usability: keep form above glows */}
-              </>
-            )}
-            {/* FORM */}
-            <div className="relative z-10">
-              <ExplainerForm onSubmit={handleSubmit} disabled={stage !== "form"} />
-            </div>
+            <ExplainerForm onSubmit={handleSubmit} disabled={stage !== "form"} />
           </div>
         )}
         {stage === "loading" && <Loader label="Summoning LLM wisdom…" />}
