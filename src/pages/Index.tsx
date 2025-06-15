@@ -1,9 +1,10 @@
-
 import React, { useState } from "react";
 import ExplainerForm, { ExplainerFormInputs } from "@/components/ExplainerForm";
 import ExplainerCard from "@/components/ExplainerCard";
 import Loader from "@/components/ui/loader";
 import { toast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { BackgroundCustomizer } from "@/components/BackgroundCustomizer";
 
 // List of fun random explanations as placeholders.
 const RANDOM_EXPLANATIONS = [
@@ -21,10 +22,15 @@ function getRandomExplanation() {
   return RANDOM_EXPLANATIONS[i];
 }
 
+const DEFAULT_COLOR1 = "#e0ffe8";
+const DEFAULT_COLOR2 = "#b1e5ff";
+
 const Index = () => {
   const [stage, setStage] = useState<"form" | "loading" | "done">("form");
   const [result, setResult] = useState<string>("");
   const [persona, setPersona] = useState<string>("");
+  const [color1, setColor1] = useState(DEFAULT_COLOR1);
+  const [color2, setColor2] = useState(DEFAULT_COLOR2);
 
   async function handleSubmit(fields: ExplainerFormInputs) {
     setStage("loading");
@@ -45,11 +51,27 @@ const Index = () => {
     setPersona("");
   }
 
+  function handleBackgroundChange(new1: string, new2: string) {
+    setColor1(new1);
+    setColor2(new2);
+  }
+
   return (
     <main
-      className={`min-h-screen flex items-center justify-center transition-all bg-gradient-to-br from-white via-slate-100 to-emerald-100 dark:from-black dark:via-slate-900 dark:to-emerald-950
-      ${stage === "done" ? "backdrop-blur-2xl" : ""}`}
+      className={`
+        min-h-screen flex items-center justify-center transition-all
+        ${stage === "done" ? "backdrop-blur-2xl" : ""}
+      `}
+      style={{
+        background: `linear-gradient(135deg, ${color1}, ${color2})`,
+        transition: "background 0.6s cubic-bezier(.24,.75,.15,1)",
+      }}
     >
+      {/* Top-right overlays: glassmorphic controls */}
+      <div className="fixed top-6 right-8 z-50 flex flex-row items-center gap-2">
+        <ThemeToggle />
+        <BackgroundCustomizer color1={color1} color2={color2} onChange={handleBackgroundChange} />
+      </div>
       <div className="w-full py-8 px-2 md:px-0">
         {stage === "form" && <ExplainerForm onSubmit={handleSubmit} disabled={stage !== "form"} />}
         {stage === "loading" && <Loader label="Summoning LLM wisdom…" />}
