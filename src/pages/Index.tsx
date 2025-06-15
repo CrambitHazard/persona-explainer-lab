@@ -3,8 +3,23 @@ import React, { useState } from "react";
 import ExplainerForm, { ExplainerFormInputs } from "@/components/ExplainerForm";
 import ExplainerCard from "@/components/ExplainerCard";
 import Loader from "@/components/ui/loader";
-import { getGroqExplanation } from "@/lib/groqClient";
 import { toast } from "@/hooks/use-toast";
+
+// List of fun random explanations as placeholders.
+const RANDOM_EXPLANATIONS = [
+  "Imagine tiny invisible elves tossing bouncy balls at each other, but the balls keep turning into waves and back. That's quantum physics!",
+  "Taxes are like dragons who want a portion of your gold for protecting your castle from goblins.",
+  "Tacos are just Mexican treasure chests full of delicious magic.",
+  "AI is just a really fast librarian who reads millions of books to answer your questions.",
+  "Think of gravity as an invisible spaghetti rope holding you to the planet!",
+  "Music is like a wizard casting a spell on your brain with sound.",
+  "Photosynthesis is like plants having a food party using sunlight as their invitation!",
+];
+
+function getRandomExplanation() {
+  const i = Math.floor(Math.random() * RANDOM_EXPLANATIONS.length);
+  return RANDOM_EXPLANATIONS[i];
+}
 
 const Index = () => {
   const [stage, setStage] = useState<"form" | "loading" | "done">("form");
@@ -15,35 +30,13 @@ const Index = () => {
     setStage("loading");
     setResult("");
     setPersona("");
-    try {
+    // Simulate thinking/loading
+    setTimeout(() => {
       const personaDisplay = `${fields.age}-year-old ${fields.fantasyRace}${fields.gender ? ` (${fields.gender})` : ""}${fields.vibe ? `, ${fields.vibe}` : ""}${fields.profession ? `, ${fields.profession}` : ""}${fields.era ? `, ${fields.era}` : ""}`;
       setPersona(personaDisplay);
-
-      // Removed groqKey usage
-      const { text } = await getGroqExplanation(
-        {
-          topic: fields.topic,
-          age: fields.age,
-          fantasyRace: fields.fantasyRace,
-          gender: fields.gender,
-          nationality: fields.nationality,
-          vibe: fields.vibe,
-          profession: fields.profession,
-          era: fields.era,
-          iq: fields.iq,
-          specialMode: fields.specialMode,
-        }
-      );
-      setResult(text.trim());
+      setResult(getRandomExplanation());
       setStage("done");
-    } catch (e: any) {
-      toast({
-        title: "Whoops!",
-        description: e?.message ? String(e.message) : "Failed to get response from LLM.",
-        variant: "destructive",
-      });
-      setStage("form");
-    }
+    }, 600);
   }
 
   function handleReset() {
