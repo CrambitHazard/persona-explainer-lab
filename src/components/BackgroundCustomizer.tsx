@@ -1,7 +1,7 @@
-
 import React, { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, Trash2, Palette } from "lucide-react";
+import { useTheme } from "next-themes";
 
 interface BackgroundCustomizerProps {
   colors: string[];
@@ -12,6 +12,8 @@ const MAX_COLORS = 6;
 
 export function BackgroundCustomizer({ colors, onColorsChange }: BackgroundCustomizerProps) {
   const [localColors, setLocalColors] = useState<string[]>(colors);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   const updateColor = (idx: number, value: string) => {
     const newColors = localColors.slice();
@@ -21,7 +23,6 @@ export function BackgroundCustomizer({ colors, onColorsChange }: BackgroundCusto
 
   const addColor = () => {
     if (localColors.length < MAX_COLORS) {
-      // Default to a fun pastel, random for more color variety
       const pastels = ["#b1e5ff", "#b9fbc0", "#ffb4ef", "#ffe066", "#fbc6a4", "#dabfff", "#ffd39e"];
       setLocalColors([...localColors, pastels[Math.floor(Math.random() * pastels.length)]]);
     }
@@ -50,24 +51,33 @@ export function BackgroundCustomizer({ colors, onColorsChange }: BackgroundCusto
           aria-label="Customize background mesh"
           className={`
             overflow-hidden p-2 ml-2 rounded-full shadow-[0_2px_16px_0_rgba(0,0,0,0.33)] 
-            border border-white/20 
+            border border-border
             backdrop-blur-2xl
-            bg-gradient-to-br from-black/40 via-slate-800/60 to-slate-950/60
-            ring-1 ring-inset ring-white/15
+            bg-gradient-to-br
+            ${isDark
+              ? "from-black/60 via-slate-800/70 to-slate-900/60"
+              : "from-white/60 via-slate-50/80 to-slate-200/70"}
+            ring-1 ring-inset ring-border
             flex items-center justify-center
             hover:scale-105 active:scale-95 transition
             relative
           `}
           style={{
-            boxShadow:"0 2px 18px 0 #1bdbcb33, 0 0.5px 4px 0 rgba(0,0,0,0.04)",
+            boxShadow: isDark
+              ? "0 2px 18px 0 #1bdbcb33, 0 0.5px 4px 0 rgba(0,0,0,0.14)"
+              : "0 2px 18px 0 #90eaff66, 0 0.5px 4px 0 rgba(0,0,0,0.09)",
           }}
         >
-          <Palette size={20} className="text-cyan-200 drop-shadow" />
+          <Palette size={20} className={`${isDark ? "text-cyan-200" : "text-emerald-700"} drop-shadow`} />
           <span
             className="absolute inset-0 pointer-events-none rounded-full"
             style={{
-              border: "1px solid #43fbe3a1",
-              boxShadow: "0 0 8px 2px #90fff644",
+              border: isDark
+                ? "1px solid #43fbe3a1"
+                : "1px solid #80dfff88",
+              boxShadow: isDark
+                ? "0 0 8px 2px #90fff644"
+                : "0 0 8px 2px #aeefff88",
             }}
           ></span>
         </button>
@@ -77,14 +87,19 @@ export function BackgroundCustomizer({ colors, onColorsChange }: BackgroundCusto
         className={`
           w-84 max-w-[20rem] min-w-[14rem] p-6 rounded-2xl
           shadow-[0_12px_36px_0_rgba(39,255,230,0.18)]
-          bg-gradient-to-br from-black/80 via-neutral-900/70 to-slate-800/80 
+          bg-gradient-to-br
+          ${isDark
+            ? "from-black/85 via-neutral-900/70 to-slate-800/80"
+            : "from-white/85 via-slate-50/70 to-slate-200/80"}
           border border-cyan-200/25
           backdrop-blur-3xl
           relative
           flex flex-col gap-3
         `}
         style={{
-          boxShadow: "0 8px 32px 0 rgba(16,255,210,0.18), 0 1.5px 7px 0 rgba(0,0,0,0.10)",
+          boxShadow: isDark
+            ? "0 8px 32px 0 rgba(16,255,210,0.18), 0 1.5px 7px 0 rgba(0,0,0,0.10)"
+            : "0 8px 32px 0 rgba(100,210,255,0.13), 0 1.5px 7px 0 rgba(0,0,0,0.09)",
         }}
       >
         <div className="mb-2 font-semibold text-cyan-100 tracking-tight text-base select-none px-0">

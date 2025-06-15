@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useTheme } from "next-themes";
 import { MoonStar, SunMedium } from "lucide-react";
@@ -14,15 +13,15 @@ export function ThemeToggle() {
       className={`
         relative transition
         shadow-[0_2px_16px_0_rgba(0,0,0,0.35)]
-        rounded-full border border-white/20 
+        rounded-full border border-border
         overflow-hidden flex items-center justify-center
         p-2
         backdrop-blur-2xl 
         bg-gradient-to-br
         ${isDark
           ? "from-black/70 via-neutral-800/70 to-slate-950/60"
-          : "from-white/60 via-slate-50/80 to-slate-200/70"}
-        ring-1 ring-inset ring-white/20
+          : "from-white/80 via-slate-50/90 to-slate-200/80"}
+        ring-1 ring-inset ring-border
         hover:scale-105 active:scale-95
       `}
       style={{
