@@ -15,7 +15,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 /**
- * Logs a prompt to Supabase and returns the user's rank for this exact prompt.
+ * Logs a prompt to Supabase and returns the user's rank for this exact prompt (excluding id/created_at).
  *
  * Args:
  *   fields: All persona and topic fields.
@@ -38,10 +38,10 @@ export async function logPromptAndGetRank(fields: {
     iq?: string;
     specialMode?: string;
 }): Promise<number> {
-    // Query for count of existing identical prompts
+    // Query for count of existing identical prompts (excluding id/created_at)
     const { data: matches, error: countError } = await supabase
         .from('prompts')
-        .select('id', { count: 'exact', head: true })
+        .select('topic,age,fantasy_race,gender,nationality,vibe,profession,era,iq,special_mode', { count: 'exact', head: false })
         .match({
             topic: fields.topic,
             age: fields.age,
@@ -76,4 +76,53 @@ export async function logPromptAndGetRank(fields: {
 
     // User's rank is count + 1
     return count + 1;
+}
+
+// Helper to query prompts for a single field value
+async function isFirstForField(key: string, value: string | null): Promise<boolean> {
+    const { data, error } = await (supabase as any)
+        .from('prompts')
+        .select('*', { count: 'exact', head: false })
+        .eq(key, value);
+    if (error) return false;
+    return (data?.length ?? 0) === 0;
+}
+
+/**
+ * Returns stats for each field: whether the user is the first to use that value in the prompts table.
+ * Args:
+ *   fields: All persona and topic fields.
+ * Returns:
+ *   Promise<Record<string, boolean>> - For each field, true if first user for that value.
+ */
+export async function getPromptStats(fields: {
+    topic: string;
+    age: string;
+    fantasyRace: string;
+    gender?: string;
+    nationality?: string;
+    vibe?: string;
+    profession?: string;
+    era?: string;
+    iq?: string;
+    specialMode?: string;
+}): Promise<Record<string, boolean>> {
+    const stats: Record<string, boolean> = {};
+    const fieldMap = {
+        topic: fields.topic,
+        age: fields.age,
+        fantasy_race: fields.fantasyRace,
+        gender: fields.gender || null,
+        nationality: fields.nationality || null,
+        vibe: fields.vibe || null,
+        profession: fields.profession || null,
+        era: fields.era || null,
+        iq: fields.iq || null,
+        special_mode: fields.specialMode || null,
+    };
+    for (const [key, value] of Object.entries(fieldMap)) {
+        if (!value) { stats[key] = false; continue; }
+        stats[key] = await isFirstForField(key, value);
+    }
+    return stats;
 }

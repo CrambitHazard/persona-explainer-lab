@@ -38,6 +38,51 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      },
+      prompts: {
+        Row: {
+          id: string
+          topic: string
+          age: string
+          fantasy_race: string
+          gender: string | null
+          nationality: string | null
+          vibe: string | null
+          profession: string | null
+          era: string | null
+          iq: string | null
+          special_mode: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          topic: string
+          age: string
+          fantasy_race: string
+          gender?: string | null
+          nationality?: string | null
+          vibe?: string | null
+          profession?: string | null
+          era?: string | null
+          iq?: string | null
+          special_mode?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          topic?: string
+          age?: string
+          fantasy_race?: string
+          gender?: string | null
+          nationality?: string | null
+          vibe?: string | null
+          profession?: string | null
+          era?: string | null
+          iq?: string | null
+          special_mode?: string | null
+          created_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

@@ -6,7 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BackgroundCustomizer } from "@/components/BackgroundCustomizer";
 import { useTheme } from "next-themes";
-import { logPromptAndGetRank } from "@/integrations/supabase/client";
+import { logPromptAndGetRank, getPromptStats } from "@/integrations/supabase/client";
 import confetti from "canvas-confetti";
 import { parseCSV, getGenreCandidates, getBestRagCandidate } from "@/lib/utils";
 import { getGroqExplanation } from "@/lib/groqClient";
@@ -131,6 +131,7 @@ function Index() {
   const [bookData, setBookData] = useState<any[] | null>(null);
   const [mangaData, setMangaData] = useState<any[] | null>(null);
   const [ragSource, setRagSource] = useState<string | null>(null);
+  const [stats, setStats] = useState<Record<string, boolean> | null>(null);
 
   async function handleSubmit(fields: ExplainerFormInputs) {
     setStage("loading");
@@ -198,8 +199,12 @@ function Index() {
           origin: { y: 0.6 },
         });
       }
+      // Get stats for each field
+      const statsResult = await getPromptStats(fields);
+      setStats(statsResult);
     } catch (e) {
       setRank(null);
+      setStats(null);
     }
     setStage("done");
   }
@@ -280,6 +285,29 @@ function Index() {
                 ) : (
                   <div className="text-lg text-cyan-200">You are the <b>{rank}{rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th'}</b> user to try this combo!</div>
                 )}
+              </div>
+            )}
+            {stats && (
+              <div className="mt-8 text-center">
+                <h3 className="text-cyan-300 text-lg font-bold mb-2">Your Prompt Stats</h3>
+                <table className="mx-auto text-sm border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="px-2 py-1 border-b border-cyan-400">Field</th>
+                      <th className="px-2 py-1 border-b border-cyan-400">First User?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(stats).map(([field, isFirst]) => (
+                      <tr key={field}>
+                        <td className="px-2 py-1 text-cyan-100">{field.replace(/_/g, ' ')}</td>
+                        <td className="px-2 py-1">
+                          {isFirst ? <span className="text-green-400 font-bold">Yes 🎉</span> : <span className="text-gray-400">No</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </>
