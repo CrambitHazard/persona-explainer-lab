@@ -6,6 +6,12 @@ import { toast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BackgroundCustomizer } from "@/components/BackgroundCustomizer";
 import { useTheme } from "next-themes";
+import { logPromptAndGetRank } from "@/integrations/supabase/client";
+import confetti from "canvas-confetti";
+import { parseCSV, getGenreCandidates, getBestRagCandidate } from "@/lib/utils";
+import { getGroqExplanation } from "@/lib/groqClient";
+import bookCSV from "../../datasets/Amazon Top 50 Books 2009-2021 - Reworked Sheet (2).csv?raw";
+import mangaCSV from "../../datasets/manga.csv?raw";
 
 // List of fun random explanations as placeholders.
 const RANDOM_EXPLANATIONS = [
@@ -93,25 +99,109 @@ function randomMeshBlobs(colors: string[], isDark: boolean) {
 
 const DEFAULT_COLORS = ["#e0ffe8", "#b1e5ff", "#ffd39e", "#ffe0f4"];
 
+function extractGenre(fields) {
+  // Naive: use fantasyRace, profession, or topic as genre
+  const genreFields = [fields.fantasyRace, fields.profession, fields.topic, fields.vibe, fields.era];
+  return (genreFields.find(g => g && typeof g === 'string') || 'Fiction').toLowerCase();
+}
+
+async function getSummaryWithOpenRouter(title, genre) {
+  // Use OpenRouter to generate a summary for a book/manga
+  const prompt = `Give a 2-3 sentence summary for the following ${genre} work: ${title}`;
+  const { text } = await getGroqExplanation({ topic: prompt, age: "18", fantasyRace: "", gender: "", nationality: "", vibe: "", profession: "", era: "", iq: "", specialMode: "" });
+  return text;
+}
+
+async function getSimilarityScoreWithOpenRouter(userPrompt, summary) {
+  // Use OpenRouter to score similarity between user prompt and summary
+  const prompt = `Given the following user request: "${userPrompt}", and the following summary: "${summary}", rate how relevant the summary is to the request on a scale of 0 (not relevant) to 10 (very relevant). Only output the number.`;
+  const { text } = await getGroqExplanation({ topic: prompt, age: "18", fantasyRace: "", gender: "", nationality: "", vibe: "", profession: "", era: "", iq: "", specialMode: "" });
+  const num = parseInt((text || '').match(/\d+/)?.[0] || '0', 10);
+  return isNaN(num) ? 0 : num;
+}
+
 function Index() {
   const [stage, setStage] = useState<"form" | "loading" | "done">("form");
   const [result, setResult] = useState<string>("");
   const [persona, setPersona] = useState<string>("");
   const [colors, setColors] = useState(DEFAULT_COLORS);
+  const [rank, setRank] = useState<number | null>(null);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const [bookData, setBookData] = useState<any[] | null>(null);
+  const [mangaData, setMangaData] = useState<any[] | null>(null);
+  const [ragSource, setRagSource] = useState<string | null>(null);
 
   async function handleSubmit(fields: ExplainerFormInputs) {
     setStage("loading");
     setResult("");
     setPersona("");
-    // Simulate thinking/loading
-    setTimeout(() => {
-      const personaDisplay = `${fields.age}-year-old ${fields.fantasyRace}${fields.gender ? ` (${fields.gender})` : ""}${fields.vibe ? `, ${fields.vibe}` : ""}${fields.profession ? `, ${fields.profession}` : ""}${fields.era ? `, ${fields.era}` : ""}`;
-      setPersona(personaDisplay);
-      setResult(getRandomExplanation());
-      setStage("done");
-    }, 600);
+    setRank(null);
+    setRagSource(null);
+
+    // Parse datasets if not already
+    let books = bookData;
+    let mangas = mangaData;
+    if (!books) {
+      books = parseCSV(bookCSV);
+      setBookData(books);
+    }
+    if (!mangas) {
+      mangas = parseCSV(mangaCSV);
+      setMangaData(mangas);
+    }
+
+    // Extract genre
+    const genre = extractGenre(fields);
+    // Get 2 candidates from each dataset
+    const bookCandidates = getGenreCandidates(genre, books, "Genre");
+    const mangaCandidates = getGenreCandidates(genre, mangas, "genres");
+    // Combine and take up to 2
+    const candidates = [...bookCandidates, ...mangaCandidates].slice(0, 2);
+
+    // For each candidate, get summary and similarity
+    const userPrompt = `${fields.topic} (${fields.fantasyRace}, ${fields.profession}, ${fields.vibe}, ${fields.era})`;
+    const candidateSummaries = await Promise.all(candidates.map(async (c) => {
+      const title = c.Name || c.name;
+      const genreField = c.Genre || c.genres;
+      const summary = await getSummaryWithOpenRouter(title, genreField);
+      const score = await getSimilarityScoreWithOpenRouter(userPrompt, summary);
+      return { ...c, summary, score };
+    }));
+    // Select best
+    let best = null;
+    let bestScore = -1;
+    for (const c of candidateSummaries) {
+      if (c.score > bestScore) {
+        best = c;
+        bestScore = c.score;
+      }
+    }
+    let ragContext = best && best.summary && best.score > 0 ? best.summary : undefined;
+    if (ragContext) {
+      setRagSource((best.Name || best.name) + (best.Genre ? ` (${best.Genre})` : best.genres ? ` (${best.genres})` : ""));
+    }
+
+    // LLM explanation with RAG
+    const personaDisplay = `${fields.age}-year-old ${fields.fantasyRace}${fields.gender ? ` (${fields.gender})` : ""}${fields.vibe ? `, ${fields.vibe}` : ""}${fields.profession ? `, ${fields.profession}` : ""}${fields.era ? `, ${fields.era}` : ""}`;
+    setPersona(personaDisplay);
+    const { text: explanation } = await getGroqExplanation(fields, ragContext);
+    setResult(explanation);
+    // Log prompt and get rank
+    try {
+      const userRank = await logPromptAndGetRank(fields);
+      setRank(userRank);
+      if (userRank === 1) {
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
+      }
+    } catch (e) {
+      setRank(null);
+    }
+    setStage("done");
   }
 
   function handleReset() {
@@ -178,7 +268,21 @@ function Index() {
         )}
         {stage === "loading" && <Loader label="Summoning LLM wisdom…" />}
         {stage === "done" && (
-          <ExplainerCard answer={result} persona={persona} onReset={handleReset} />
+          <>
+            <ExplainerCard answer={result} persona={persona} onReset={handleReset} />
+            {ragSource && (
+              <div className="mt-4 text-center text-sm text-cyan-300">RAG Source: {ragSource}</div>
+            )}
+            {rank && (
+              <div className="mt-6 text-center">
+                {rank === 1 ? (
+                  <div className="text-2xl font-bold text-green-400 animate-bounce">🎉 You are the FIRST user to try this combo! 🎉</div>
+                ) : (
+                  <div className="text-lg text-cyan-200">You are the <b>{rank}{rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th'}</b> user to try this combo!</div>
+                )}
+              </div>
+            )}
+          </>
         )}
         <div className="fixed bottom-4 left-0 w-full flex justify-center pointer-events-none z-40 select-none">
           <span className="

@@ -2,10 +2,78 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://nazqoznqpxyusggdselg.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5henFvem5xcHh5dXNnZ2RzZWxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MjU3MzAsImV4cCI6MjA2NTUwMTczMH0.2n6MocDNOdk5xBxba01-__mWsvnDrcGH6VZZkBhab8c";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    throw new Error('Supabase environment variables are not set.');
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+/**
+ * Logs a prompt to Supabase and returns the user's rank for this exact prompt.
+ *
+ * Args:
+ *   fields: All persona and topic fields.
+ *
+ * Returns:
+ *   Promise<number> - The user's rank (1 = first user, 2 = second, etc.)
+ *
+ * Raises:
+ *   Error if Supabase call fails.
+ */
+export async function logPromptAndGetRank(fields: {
+    topic: string;
+    age: string;
+    fantasyRace: string;
+    gender?: string;
+    nationality?: string;
+    vibe?: string;
+    profession?: string;
+    era?: string;
+    iq?: string;
+    specialMode?: string;
+}): Promise<number> {
+    // Query for count of existing identical prompts
+    const { data: matches, error: countError } = await supabase
+        .from('prompts')
+        .select('id', { count: 'exact', head: true })
+        .match({
+            topic: fields.topic,
+            age: fields.age,
+            fantasy_race: fields.fantasyRace,
+            gender: fields.gender || null,
+            nationality: fields.nationality || null,
+            vibe: fields.vibe || null,
+            profession: fields.profession || null,
+            era: fields.era || null,
+            iq: fields.iq || null,
+            special_mode: fields.specialMode || null,
+        });
+    if (countError) throw new Error('Supabase count error: ' + countError.message);
+    const count = matches?.length ?? 0;
+
+    // Insert the new prompt
+    const { error: insertError } = await supabase
+        .from('prompts')
+        .insert({
+            topic: fields.topic,
+            age: fields.age,
+            fantasy_race: fields.fantasyRace,
+            gender: fields.gender || null,
+            nationality: fields.nationality || null,
+            vibe: fields.vibe || null,
+            profession: fields.profession || null,
+            era: fields.era || null,
+            iq: fields.iq || null,
+            special_mode: fields.specialMode || null,
+        });
+    if (insertError) throw new Error('Supabase insert error: ' + insertError.message);
+
+    // User's rank is count + 1
+    return count + 1;
+}
